@@ -3,7 +3,6 @@ package cloudStorage
 import (
 	"bytes"
 	"fmt"
-	"github.com/golang-microservices/cloud-storage/model"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -57,17 +56,17 @@ func NewSharepoint(url, username, password string) Filestore {
 }
 
 // Search ...
-func (dr *SharepointService) Search(fileModel *model.FileModel) (interface{}, error) {
+func (dr *SharepointService) Search(fileModel *FileModel) (interface{}, error) {
 	return nil, nil
 }
 
 // Metadata
-func (dr *SharepointService) Metadata(fileModel *model.FileModel) (interface{}, error) {
+func (dr *SharepointService) Metadata(fileModel *FileModel) (interface{}, error) {
 	return nil, nil
 }
 
 // List function return all files with id and title
-func (sp *SharepointService) List(fileModel *model.FileModel) (interface{}, error) {
+func (sp *SharepointService) List(fileModel *FileModel) (interface{}, error) {
 	// Assumes you have Custom list created
 	endpoint := sp.Client.AuthCnfg.GetSiteURL() + "/_api/web/lists/getByTitle('Custom')/items"
 	req, err := http.NewRequest(
@@ -96,7 +95,7 @@ func (sp *SharepointService) List(fileModel *model.FileModel) (interface{}, erro
 }
 
 // Upload function upload file to sharepoint
-func (sp *SharepointService) Upload(fileModel *model.FileModel) (interface{}, error) {
+func (sp *SharepointService) Upload(fileModel *FileModel) (interface{}, error) {
 	endpoint := fmt.Sprintf(
 		"%s/_api/web/getFolderByServerRelativeUrl('%s')/files/add(overwrite=true,url='%s')",
 		sp.Client.AuthCnfg.GetSiteURL(),
@@ -135,7 +134,7 @@ func (sp *SharepointService) Upload(fileModel *model.FileModel) (interface{}, er
 }
 
 // Download function will return a file. Now, fileID is File URI that can be host relevant (e.g. `/sites/site/lib/folder/file.txt`)
-func (sp *SharepointService) Download(fileModel *model.FileModel) (interface{}, error) {
+func (sp *SharepointService) Download(fileModel *FileModel) (interface{}, error) {
 	endpoint := fmt.Sprintf(
 		"%s/_api/Web/GetFileByServerRelativeUrl(@FileServerRelativeUrl)/$value?@FileServerRelativeUrl='%s'",
 		sp.Client.AuthCnfg.GetSiteURL(),
@@ -163,17 +162,17 @@ func (sp *SharepointService) Download(fileModel *model.FileModel) (interface{}, 
 }
 
 // Delete function will delete a file with fileID
-func (sp *SharepointService) Delete(fileModel *model.FileModel) error {
+func (sp *SharepointService) Delete(fileModel *FileModel) error {
 	//_, err := sp.SharepointService.Conf(config).Web().GetFile(fileModel.SourcesID).Recycle()
 	return nil
 }
 
 // Move function will move a file base on 'Sources' and 'Destination'
-func (sp *SharepointService) Move(fileModel *model.FileModel) (interface{}, []error) {
+func (sp *SharepointService) Move(fileModel *FileModel) (interface{}, []error) {
 	return nil, nil
 }
 
 // CreateFolder function will create a folder base on 'Destination'
-func (sp *SharepointService) CreateFolder(fileModel *model.FileModel) (interface{}, error) {
+func (sp *SharepointService) CreateFolder(fileModel *FileModel) (interface{}, error) {
 	return nil, nil
 }

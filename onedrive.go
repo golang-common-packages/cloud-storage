@@ -9,13 +9,11 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
-
-	"github.com/golang-microservices/cloud-storage/model"
 )
 
 // OneDriveService manage all drive action
 type OneDriveService struct {
-	Authentication *model.OneDrive
+	Authentication *OneDrive
 	URL            string
 }
 
@@ -23,7 +21,7 @@ type OneDriveService struct {
 func NewOneDrive(url, accessToken, refreshToken string) Filestore {
 	currentSession := &OneDriveService{nil, ""}
 
-	oneDriveAuth := &model.OneDrive{
+	oneDriveAuth := &OneDrive{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}
@@ -36,7 +34,7 @@ func NewOneDrive(url, accessToken, refreshToken string) Filestore {
 }
 
 // Search ...
-func (od *OneDriveService) Search(fileModel *model.FileModel) (interface{}, error) {
+func (od *OneDriveService) Search(fileModel *FileModel) (interface{}, error) {
 	deletePatch := fmt.Sprintf(od.URL+"/me/drive/search(q='%s')", filepath.Base(fileModel.Query))
 
 	request := putRequest(deletePatch, od.Authentication.AccessToken, fileModel.Content)
@@ -54,12 +52,12 @@ func (od *OneDriveService) Search(fileModel *model.FileModel) (interface{}, erro
 }
 
 // Metadata ...
-func (od *OneDriveService) Metadata(fileModel *model.FileModel) (interface{}, error) {
+func (od *OneDriveService) Metadata(fileModel *FileModel) (interface{}, error) {
 	return nil, nil
 }
 
 // List ...
-func (od *OneDriveService) List(fileModel *model.FileModel) (interface{}, error) {
+func (od *OneDriveService) List(fileModel *FileModel) (interface{}, error) {
 	childrenURL := od.URL + "/me/drive/root/children"
 
 	if fileModel.Path != "" {
@@ -84,7 +82,7 @@ func (od *OneDriveService) List(fileModel *model.FileModel) (interface{}, error)
 }
 
 // Upload ...
-func (od *OneDriveService) Upload(fileModel *model.FileModel) (interface{}, error) {
+func (od *OneDriveService) Upload(fileModel *FileModel) (interface{}, error) {
 	uploadFileURL := fmt.Sprintf(od.URL+"/me/drive/root:/%s:/content", filepath.Base(fileModel.Path))
 
 	if filepath.Dir(fileModel.Path) != "." {
@@ -110,7 +108,7 @@ func (od *OneDriveService) Upload(fileModel *model.FileModel) (interface{}, erro
 }
 
 // Download ...
-func (od *OneDriveService) Download(fileModel *model.FileModel) (interface{}, error) {
+func (od *OneDriveService) Download(fileModel *FileModel) (interface{}, error) {
 	url := fmt.Sprintf(od.URL+"/me/drive/root:/%s:/content", fileModel.Path)
 	request := getRequest(url, od.Authentication.AccessToken)
 
@@ -127,7 +125,7 @@ func (od *OneDriveService) Download(fileModel *model.FileModel) (interface{}, er
 }
 
 // Delete ...
-func (od *OneDriveService) Delete(fileModel *model.FileModel) error {
+func (od *OneDriveService) Delete(fileModel *FileModel) error {
 	deletePatch := fmt.Sprintf(od.URL+"/me/drive/items/:%s:", filepath.Base(fileModel.Path))
 
 	request := deleteRequest(deletePatch, od.Authentication.AccessToken)
@@ -144,13 +142,13 @@ func (od *OneDriveService) Delete(fileModel *model.FileModel) error {
 }
 
 // Move ...
-func (od *OneDriveService) Move(fileModel *model.FileModel) (interface{}, []error) {
+func (od *OneDriveService) Move(fileModel *FileModel) (interface{}, []error) {
 	var mvErrors []error
 	createFolderPatch := fmt.Sprintf(od.URL+"/me/drive/items/%s", filepath.Base(fileModel.SourcesID))
 
-	moveFolderInfo := &model.MoveOneDriveItem{
+	moveFolderInfo := &MoveOneDriveItem{
 		Name:            fileModel.Name,
-		ParentReference: model.ID{"{new-parent-folder-id}"},
+		ParentReference: ID{"{new-parent-folder-id}"},
 	}
 
 	// Convert struct to io.Reader
@@ -174,10 +172,10 @@ func (od *OneDriveService) Move(fileModel *model.FileModel) (interface{}, []erro
 }
 
 // CreateFolder ...
-func (od *OneDriveService) CreateFolder(fileModel *model.FileModel) (interface{}, error) {
+func (od *OneDriveService) CreateFolder(fileModel *FileModel) (interface{}, error) {
 	createFolderPatch := fmt.Sprintf(od.URL + "/me/drive/root/children")
 
-	createFolderInfo := &model.CreateOneDriveFolder{
+	createFolderInfo := &CreateOneDriveFolder{
 		Name:                           fileModel.Name,
 		MicrosoftGraphConflictBehavior: "rename",
 	}
@@ -202,52 +200,52 @@ func (od *OneDriveService) CreateFolder(fileModel *model.FileModel) (interface{}
 
 // OneDrive util
 // itemByPath ...
-func itemByPath(accessToken string, url, path string) (model.OneDriveItem, error) {
+func itemByPath(accessToken string, url, path string) (OneDriveItem, error) {
 	client := &http.Client{}
 	itemByPathURL := fmt.Sprintf(url+"/me/drive/root:/%s", path)
 
 	request := getRequest(itemByPathURL, accessToken)
 	response, err := client.Do(request)
 	if err != nil {
-		return model.OneDriveItem{}, err
+		return OneDriveItem{}, err
 	}
 
 	return unmarshallItemResponse(response)
 }
 
 // listItemsAsStruct ...
-func listItemsAsStruct(accessToken string, url string) (model.ListOneDriveItem, error) {
+func listItemsAsStruct(accessToken string, url string) (ListOneDriveItem, error) {
 	client := &http.Client{}
 	request := getRequest(url, accessToken)
 	response, err := client.Do(request)
 	if err != nil {
-		return model.ListOneDriveItem{}, err
+		return ListOneDriveItem{}, err
 	}
 	return unmarshallListResponse(response)
 }
 
 // unmarshallListResponse ...
-func unmarshallListResponse(response *http.Response) (model.ListOneDriveItem, error) {
+func unmarshallListResponse(response *http.Response) (ListOneDriveItem, error) {
 	defer response.Body.Close()
 	body, _ := ioutil.ReadAll(response.Body)
-	var unmarshalledResponse model.ListOneDriveItem
+	var unmarshalledResponse ListOneDriveItem
 
 	err := json.Unmarshal(body, &unmarshalledResponse)
 	if err != nil {
-		return model.ListOneDriveItem{}, err
+		return ListOneDriveItem{}, err
 	}
 	return unmarshalledResponse, nil
 }
 
 // unmarshallItemResponse ...
-func unmarshallItemResponse(response *http.Response) (model.OneDriveItem, error) {
+func unmarshallItemResponse(response *http.Response) (OneDriveItem, error) {
 	defer response.Body.Close()
 	body, _ := ioutil.ReadAll(response.Body)
-	var unmarshalledResponse model.OneDriveItem
+	var unmarshalledResponse OneDriveItem
 
 	err := json.Unmarshal(body, &unmarshalledResponse)
 	if err != nil {
-		return model.OneDriveItem{}, err
+		return OneDriveItem{}, err
 	}
 	return unmarshalledResponse, nil
 }

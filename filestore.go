@@ -1,21 +1,17 @@
 package cloudStorage
 
-import (
-	"context"
-
-	"github.com/golang-microservices/cloud-storage/model"
-)
+import "context"
 
 // Filestore interface for API storage
 type Filestore interface {
-	Search(fileModel *model.FileModel) (interface{}, error)
-	Metadata(fileModel *model.FileModel) (interface{}, error)
-	List(fileModel *model.FileModel) (interface{}, error)
-	Upload(fileModel *model.FileModel) (interface{}, error)
-	Download(fileModel *model.FileModel) (interface{}, error)
-	Delete(fileModel *model.FileModel) error
-	Move(fileModel *model.FileModel) (interface{}, []error)
-	CreateFolder(fileModel *model.FileModel) (interface{}, error)
+	Search(fileModel *FileModel) (interface{}, error)
+	Metadata(fileModel *FileModel) (interface{}, error)
+	List(fileModel *FileModel) (interface{}, error)
+	Upload(fileModel *FileModel) (interface{}, error)
+	Download(fileModel *FileModel) (interface{}, error)
+	Delete(fileModel *FileModel) error
+	Move(fileModel *FileModel) (interface{}, []error)
+	CreateFolder(fileModel *FileModel) (interface{}, error)
 }
 
 var (
@@ -36,16 +32,16 @@ const (
 )
 
 // NewFilestore function for Factory Pattern
-func NewFilestore(storageType int, config *model.Service) Filestore {
+func NewFilestore(storageType int, config *Config) Filestore {
 	switch storageType {
 	case DRIVE:
-		return NewDrive(config)
+		return NewDrive()
 	case DROPBOX:
-		return NewDropbox(config)
+		return NewDropbox(config.AccessToken)
 	case ONEDRIVE:
-		return NewOneDrive(config)
+		return NewOneDrive(config.URL, config.AccessToken, config.RefreshToken)
 	case SHAREPOINT:
-		return NewSharepoint(config)
+		return NewSharepoint(config.URL, config.AccessToken, config.RefreshToken)
 	}
 
 	return nil
