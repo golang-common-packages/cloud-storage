@@ -1,15 +1,29 @@
-package model
+package cloudStorage
 
-import (
-	"io"
-)
+import "io"
+
+// Config for factory parameter
+type Config struct {
+	URL          string `json:"url,omitempty"`
+	Username     string `json:"username,omitempty"`
+	Password     string `json:"password,omitempty"`
+	AccessToken  string `json:"accessToken,omitempty"`
+	RefreshToken string `json:"refreshToken,omitempty"`
+}
+
+// OneDrive provide a connection information for Microsoft OneDrive
+type OneDrive struct {
+	URL          string `json:"url,omitempty"`
+	AccessToken  string `json:"accessToken,omitempty"`
+	RefreshToken string `json:"refreshToken,omitempty"`
+}
 
 // ID to which one needs it
 type ID struct {
 	ID string `json:"id,omitempty"`
 }
 
-// FileModel for filestore service
+// FileModel for init instant parameter
 type FileModel struct {
 	ParentID      string    `json:"parentID,omitempty"`
 	SourcesID     string    `json:"sourcesID,omitempty"`
@@ -25,13 +39,13 @@ type FileModel struct {
 	Query         string    `json:"query,omitempty"`
 }
 
-// OneDriveItem for OneDrive item object
+// OneDriveItem for item object
 type OneDriveItem struct {
 	Name string `json:"name"`
 	ID   string `json:"id"`
 }
 
-// ListOneDriveItem for OneDrive list item object
+// ListOneDriveItem for list item object
 type ListOneDriveItem struct {
 	Value []OneDriveItem `json:"value,omitempty"`
 }
@@ -42,6 +56,7 @@ type CreateOneDriveFolder struct {
 	MicrosoftGraphConflictBehavior string `json:"@microsoft.graph.conflictBehavior,omitempty"`
 }
 
+// MoveOneDriveItem for move item
 type MoveOneDriveItem struct {
 	Name            string `json:"name,omitempty"`
 	ParentReference ID     `json:"parentReference,omitempty"`

@@ -7,8 +7,6 @@ import (
 	"os"
 
 	"google.golang.org/api/drive/v3"
-
-	"github.com/golang-microservices/cloud-storage/model"
 )
 
 // DriveServices manage all drive action
@@ -32,24 +30,23 @@ func NewDrive() Filestore {
 }
 
 // Search ...
-// Search ...
-func (dr *DriveServices) Search(fileModel *model.FileModel) (interface{}, error) {
+func (dr *DriveServices) Search(fileModel *FileModel) (interface{}, error) {
 	return nil, nil
 }
 
-// Metadata
-func (dr *DriveServices) Metadata(fileModel *model.FileModel) (interface{}, error) {
+// Metadata ...
+func (dr *DriveServices) Metadata(fileModel *FileModel) (interface{}, error) {
 	return nil, nil
 }
 
 // List function return all files
-func (dr *DriveServices) List(fileModel *model.FileModel) (interface{}, error) {
+func (dr *DriveServices) List(fileModel *FileModel) (interface{}, error) {
 	files, err := dr.driveService.Files.List().Do()
 	return files, err
 }
 
 // Upload function upload file to drive
-func (dr *DriveServices) Upload(fileModel *model.FileModel) (interface{}, error) {
+func (dr *DriveServices) Upload(fileModel *FileModel) (interface{}, error) {
 	f := &drive.File{
 		MimeType: fileModel.MimeType,
 		Name:     fileModel.Name,
@@ -65,7 +62,7 @@ func (dr *DriveServices) Upload(fileModel *model.FileModel) (interface{}, error)
 }
 
 // Download function will return a file base on fileID
-func (dr *DriveServices) Download(fileModel *model.FileModel) (interface{}, error) {
+func (dr *DriveServices) Download(fileModel *FileModel) (interface{}, error) {
 	res, err := dr.driveService.Files.Get(fileModel.SourcesID).Download()
 	if err != nil {
 		return nil, err
@@ -94,17 +91,17 @@ func (dr *DriveServices) Download(fileModel *model.FileModel) (interface{}, erro
 }
 
 // Delete function will delete a file base on fileID
-func (dr *DriveServices) Delete(fileModel *model.FileModel) error {
+func (dr *DriveServices) Delete(fileModel *FileModel) error {
 	err := dr.driveService.Files.Delete(fileModel.SourcesID).Do()
 	return err
 }
 
 // Move function will move a file base on 'Sources' and 'Destination'
-func (dr *DriveServices) Move(fileModel *model.FileModel) (interface{}, []error) {
+func (dr *DriveServices) Move(fileModel *FileModel) (interface{}, []error) {
 	return nil, nil
 }
 
 // CreateFolder function will create a folder base on 'Destination'
-func (dr *DriveServices) CreateFolder(fileModel *model.FileModel) (interface{}, error) {
+func (dr *DriveServices) CreateFolder(fileModel *FileModel) (interface{}, error) {
 	return nil, nil
 }

@@ -11,8 +11,6 @@ import (
 
 	"github.com/dropbox/dropbox-sdk-go-unofficial/dropbox"
 	"github.com/dropbox/dropbox-sdk-go-unofficial/dropbox/files"
-
-	"github.com/golang-microservices/cloud-storage/model"
 )
 
 // DropboxServices manage all API action
@@ -40,12 +38,12 @@ func NewDropbox(token string) Filestore {
 }
 
 // Search ...
-func (db *DropboxServices) Search(fileModel *model.FileModel) (interface{}, error) {
+func (db *DropboxServices) Search(fileModel *FileModel) (interface{}, error) {
 	return nil, nil
 }
 
 // Metadata ...
-func (db *DropboxServices) Metadata(fileModel *model.FileModel) (interface{}, error) {
+func (db *DropboxServices) Metadata(fileModel *FileModel) (interface{}, error) {
 	arg := files.NewGetMetadataArg(fileModel.Path)
 
 	res, err := db.client.GetMetadata(arg)
@@ -57,7 +55,7 @@ func (db *DropboxServices) Metadata(fileModel *model.FileModel) (interface{}, er
 }
 
 // List ...
-func (db *DropboxServices) List(fileModel *model.FileModel) (interface{}, error) {
+func (db *DropboxServices) List(fileModel *FileModel) (interface{}, error) {
 	var err error
 	var entries []files.IsMetadata
 
@@ -85,7 +83,7 @@ func (db *DropboxServices) List(fileModel *model.FileModel) (interface{}, error)
 }
 
 // Upload ...
-func (db *DropboxServices) Upload(fileModel *model.FileModel) (interface{}, error) {
+func (db *DropboxServices) Upload(fileModel *FileModel) (interface{}, error) {
 	dst, err := validatePath(fileModel.Destination)
 	if err != nil {
 		return nil, err
@@ -128,7 +126,7 @@ func (db *DropboxServices) Upload(fileModel *model.FileModel) (interface{}, erro
 }
 
 // Download ...
-func (db *DropboxServices) Download(fileModel *model.FileModel) (interface{}, error) {
+func (db *DropboxServices) Download(fileModel *FileModel) (interface{}, error) {
 	src, err := validatePath(fileModel.Source)
 	if err != nil {
 		return nil, err
@@ -145,7 +143,7 @@ func (db *DropboxServices) Download(fileModel *model.FileModel) (interface{}, er
 }
 
 // Delete ...
-func (db *DropboxServices) Delete(fileModel *model.FileModel) error {
+func (db *DropboxServices) Delete(fileModel *FileModel) error {
 	force := true // Force delete file
 	var deletePaths []string
 
@@ -187,7 +185,7 @@ func (db *DropboxServices) Delete(fileModel *model.FileModel) error {
 }
 
 // Move ...
-func (db *DropboxServices) Move(fileModel *model.FileModel) (interface{}, []error) {
+func (db *DropboxServices) Move(fileModel *FileModel) (interface{}, []error) {
 	var mvErrors []error
 	var relocationArgs []*files.RelocationArg
 
@@ -225,7 +223,7 @@ func (db *DropboxServices) Move(fileModel *model.FileModel) (interface{}, []erro
 }
 
 // CreateFolder ...
-func (db *DropboxServices) CreateFolder(fileModel *model.FileModel) (interface{}, error) {
+func (db *DropboxServices) CreateFolder(fileModel *FileModel) (interface{}, error) {
 	dst, err := validatePath(fileModel.Destination)
 	if err != nil {
 		return nil, err
