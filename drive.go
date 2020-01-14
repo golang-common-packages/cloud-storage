@@ -1,10 +1,12 @@
-package filestore
+package cloudStorage
 
 import (
 	"io"
 	"log"
 	"mime"
 	"os"
+
+	"google.golang.org/api/drive/v3"
 
 	"github.com/golang-microservices/cloud-storage/model"
 )
@@ -14,29 +16,17 @@ type DriveServices struct {
 	driveService *drive.Service
 }
 
-/*
-	@driveSession: Mapping between hash and DriveServices for singleton pattern
-*/
-var (
-	driveSession = make(map[string]*DriveServices)
-)
-
 // NewDrive function return a new mongo client based on singleton pattern
-func NewDrive(config *model.Service) Filestore {
-	hash := config.Hash()
-	currentSession := driveSession[hash]
-	if currentSession == nil {
-		currentSession = &DriveServices{nil}
+func NewDrive() Filestore {
+	currentSession := &DriveServices{nil}
 
-		driveService, err := drive.NewService(ctx)
-		if err != nil {
-			log.Fatalf("Unable to retrieve GOOGLE_APPLICATION_CREDENTIALS %v", err)
-		}
-
-		currentSession.driveService = driveService
-		driveSession[hash] = currentSession
-		log.Println("Connected to Google Drive")
+	driveService, err := drive.NewService(ctx)
+	if err != nil {
+		log.Fatalf("Unable to retrieve GOOGLE_APPLICATION_CREDENTIALS %v", err)
 	}
+
+	currentSession.driveService = driveService
+	log.Println("Connected to Google Drive")
 
 	return currentSession
 }

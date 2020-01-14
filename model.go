@@ -1,4 +1,4 @@
-package model
+package cloudStorage
 
 import (
 	"io"
@@ -33,7 +33,7 @@ type OneDriveItem struct {
 
 // ListOneDriveItem for OneDrive list item object
 type ListOneDriveItem struct {
-	Value []OneDriveItem `json:"value"`
+	Value []OneDriveItem `json:"value,omitempty"`
 }
 
 // CreateOneDriveFolder for create folder

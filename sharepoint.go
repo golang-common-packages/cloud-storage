@@ -1,8 +1,9 @@
-package filestore
+package cloudStorage
 
 import (
 	"bytes"
 	"fmt"
+	"github.com/golang-microservices/cloud-storage/model"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,8 +12,6 @@ import (
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/api"
 	strategy "github.com/koltyakov/gosip/auth/saml"
-
-	"github.com/golang-microservices/cloud-storage/model"
 )
 
 // SharepointService manage all sharepoint action
@@ -26,8 +25,7 @@ type SharepointService struct {
 	@sharepoinSession: Mapping between hash and SharepointService for singleton pattern
 */
 var (
-	sharepoinSession = make(map[string]*SharepointService)
-	headers          = map[string]string{
+	headers = map[string]string{
 		"Accept":          "application/json;odata=minimalmetadata",
 		"Accept-Language": "de-DE,de;q=0.9",
 	}
@@ -35,31 +33,25 @@ var (
 )
 
 // NewSharepoint function return a new sharepoint service based on singleton pattern
-func NewSharepoint(config *model.Service) Filestore {
-	hash := config.Hash()
-	currentSession := sharepoinSession[hash]
+func NewSharepoint(url, username, password string) Filestore {
+	currentSession := &SharepointService{nil, nil, nil}
 
-	if currentSession == nil {
-		currentSession = &SharepointService{nil, nil, nil}
-
-		auth := &strategy.AuthCnfg{
-			SiteURL:  config.Database.Sharepoint.SiteURL,
-			Username: config.Database.Sharepoint.Username,
-			Password: config.Database.Sharepoint.Password,
-		}
-
-		client := &gosip.SPClient{
-			AuthCnfg: auth,
-		}
-
-		SharepointService := api.NewSP(client)
-
-		currentSession.Auth = auth
-		currentSession.Client = client
-		currentSession.SharepointService = SharepointService
-		sharepoinSession[hash] = currentSession
-		log.Println("Connected to Sharepoint Server")
+	auth := &strategy.AuthCnfg{
+		SiteURL:  url,
+		Username: username,
+		Password: password,
 	}
+
+	client := &gosip.SPClient{
+		AuthCnfg: auth,
+	}
+
+	SharepointService := api.NewSP(client)
+
+	currentSession.Auth = auth
+	currentSession.Client = client
+	currentSession.SharepointService = SharepointService
+	log.Println("Connected to Sharepoint Server")
 
 	return currentSession
 }
@@ -172,8 +164,8 @@ func (sp *SharepointService) Download(fileModel *model.FileModel) (interface{}, 
 
 // Delete function will delete a file with fileID
 func (sp *SharepointService) Delete(fileModel *model.FileModel) error {
-	_, err := sp.SharepointService.Conf(config).Web().GetFile(fileModel.SourcesID).Recycle()
-	return err
+	//_, err := sp.SharepointService.Conf(config).Web().GetFile(fileModel.SourcesID).Recycle()
+	return nil
 }
 
 // Move function will move a file base on 'Sources' and 'Destination'

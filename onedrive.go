@@ -1,4 +1,4 @@
-package filestore
+package cloudStorage
 
 import (
 	"bytes"
@@ -19,30 +19,18 @@ type OneDriveService struct {
 	URL            string
 }
 
-/*
-	@oneDriveSession: Mapping between hash and OneDriveService for singleton pattern
-*/
-var (
-	oneDriveSession = make(map[string]*OneDriveService)
-)
-
 // NewOneDrive function return a new onedrive client based on singleton pattern
-func NewOneDrive(config *model.Service) Filestore {
-	hash := config.Hash()
-	currentSession := oneDriveSession[hash]
-	if currentSession == nil {
-		currentSession = &OneDriveService{nil, ""}
+func NewOneDrive(url, accessToken, refreshToken string) Filestore {
+	currentSession := &OneDriveService{nil, ""}
 
-		oneDriveAuth := &model.OneDrive{
-			AccessToken:  config.Database.OneDrive.AccessToken,
-			RefreshToken: config.Database.OneDrive.RefreshToken,
-		}
-
-		currentSession.Authentication = oneDriveAuth
-		currentSession.URL = config.Database.OneDrive.URL
-		oneDriveSession[hash] = currentSession
-		log.Println("Connected to OneDrive")
+	oneDriveAuth := &model.OneDrive{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	}
+
+	currentSession.Authentication = oneDriveAuth
+	currentSession.URL = url
+	log.Println("Connected to OneDrive")
 
 	return currentSession
 }

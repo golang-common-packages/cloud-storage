@@ -1,4 +1,4 @@
-package filestore
+package cloudStorage
 
 import (
 	"fmt"
@@ -21,32 +21,21 @@ type DropboxServices struct {
 	client files.Client
 }
 
-/*
-	@dropboxSession: Mapping between hash and config for singleton pattern
-*/
-var (
-	dropboxSession = make(map[string]*DropboxServices)
-)
-
 const (
 	chunkSize int64 = 1 << 24 // 1 << 24 = 16777216
 )
 
 // NewDropbox ...
-func NewDropbox(config *model.Service) Filestore {
-	hash := config.Hash()
-	currentSession := dropboxSession[hash]
-	if currentSession == nil {
-		currentSession = &DropboxServices{nil, nil}
-		config := dropbox.Config{
-			Token:    config.Database.Dropbox.Token,
-			LogLevel: dropbox.LogInfo,
-		}
-		currentSession.config = &config
-		currentSession.client = files.New(config)
-		dropboxSession[hash] = currentSession
-		log.Println("Connected to Dropbox")
+func NewDropbox(token string) Filestore {
+	currentSession := &DropboxServices{nil, nil}
+	dbxConfig := dropbox.Config{
+		Token:    token,
+		LogLevel: dropbox.LogInfo,
 	}
+	currentSession.config = &dbxConfig
+	currentSession.client = files.New(dbxConfig)
+	log.Println("Connected to Dropbox")
+
 	return currentSession
 }
 
