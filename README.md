@@ -1,7 +1,7 @@
 # Cloud Storage Service
 
 ```go
-import "github.com/golang-microservices/cloud-storage"
+import "github.com/golang-common-packages/cloud-storage"
 ```
 
 ```go

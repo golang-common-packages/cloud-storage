@@ -1,4 +1,4 @@
-module github.com/golang-microservices/cloud-storage
+module github.com/golang-common-packages/cloud-storage
 
 go 1.13
 
